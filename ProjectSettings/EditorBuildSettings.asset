@@ -6,12 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/EncuentraIntrusoScene.unity
-    guid: ce75bb540bf6952408dae39745abc252
-  - enabled: 0
     path: Assets/Scenes/IntroScene.unity
     guid: fef87efef7d187047979b40b9bb0337d
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity
     guid: 02d6fc6e2b01e334a9514f2b1b604c49
+  - enabled: 1
+    path: Assets/Scenes/IntrusoTitleScene.unity
+    guid: 52059827134699d49af7490dfbe6b38a
+  - enabled: 1
+    path: Assets/Scenes/IntrusoGameScene.unity
+    guid: ce75bb540bf6952408dae39745abc252
+  - enabled: 1
+    path: Assets/Scenes/IntrusoPointsScene.unity
+    guid: 01229ed1f0023b84281d7fbf9fe4e992
   m_configObjects: {}
