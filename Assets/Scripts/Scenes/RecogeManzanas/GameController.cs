@@ -15,13 +15,23 @@ public class GameController : MonoBehaviour
     };// Array de textos incorrectos
     public GameObject[] applePieces; // Referencias a los pedazos de manzana
     public GameObject appleWhole;
+    public GameObject monkey;
 
-    public float fallSpeed = 10f;
+    public AudioClip[] wordClips; // Array de clips de audio para las palabras correctas
+    private AudioSource audioSource; // Fuente de audio
+    public float timeBetweenRepeats = 15f; // Tiempo entre las repeticiones del sonido
+
+
+    public float fallSpeed = 3f;
     public float minX = -2f; // Límite izquierdo del árbol
     public float maxX = 2f;  // Límite derecho del árbol
     public float startY = 3.5f; // Altura inicial de la manzana
 
+    public float[] separationPieces = { 0f, -6f, 6f };
+    public float[] startYPieces = { -2.61f, -2.81f, -2.71f };
+
     private Animator animator;
+    private Animator animatorMonkey;
     public float rotateSpeed = 100f;
 
     public int score = 100; // Puntaje inicial
@@ -35,14 +45,20 @@ public class GameController : MonoBehaviour
     void Start()
     {
         animator = appleWhole.GetComponent<Animator>();
+        animatorMonkey = monkey.GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource no encontrado en el GameController.");
+            return;
+        }
         StartRound();
+        InvokeRepeating("PlayCorrectSound", timeBetweenRepeats, timeBetweenRepeats);
     }
 
     void StartRound()
     {
         roundFinished = false;
-        // Seleccionar un texto correcto aleatorio
-        currentCorrectText = possibleCorrectTexts[Random.Range(0, possibleCorrectTexts.Length)];
 
         // Selecciona un texto correcto aleatorio del array
         currentCorrectText = possibleCorrectTexts[Random.Range(0, possibleCorrectTexts.Length)];
@@ -59,7 +75,6 @@ public class GameController : MonoBehaviour
 
             if (textMeshPro != null && i < textPool.Count)
             {
-                Debug.Log(textMeshPro.text);
                 textMeshPro.text = textPool[i];
             }
         }
@@ -75,8 +90,25 @@ public class GameController : MonoBehaviour
     {
         // Configurar la posición inicial de la manzana
         float randomX = Random.Range(minX, maxX);
-        appleWhole.transform.position = new Vector3(randomX, startY, transform.position.z);
-        appleWhole.SetActive(true);
+        appleWhole.transform.position = new Vector3(randomX, startY, appleWhole.transform.position.z);
+        int x = 0;
+        float randomFlip = Random.Range(0f, 1f);
+        float randomRotation = Random.Range(-0.5f, 0.5f);
+        foreach (GameObject piece in applePieces)
+        {
+            float positionX = randomX + separationPieces[x];
+            piece.transform.position = new Vector3(positionX , startYPieces[x], piece.transform.position.z);
+            
+            piece.transform.rotation = Quaternion.Euler(new Vector3(0, 0, randomRotation));
+            SpriteRenderer spriteRenderer = piece.GetComponent<SpriteRenderer>();
+            if(randomFlip > 0.5f)
+            {
+                spriteRenderer.flipX = !spriteRenderer.flipX;
+            }
+            randomFlip = Random.Range(0f, 1f);
+            x +=1;
+        }
+            appleWhole.SetActive(true);
         // Iniciar la secuencia de animación y caída
         StartCoroutine(WobbleAndFall());
     }
@@ -91,11 +123,13 @@ public class GameController : MonoBehaviour
         // Reproducir la animación de tambaleo
         animator.Play("AppleWobble");
 
-        // Esperar hasta que la animación de tambaleo termine
+        // Esperar a que la animación "AppleWobble" termine completamente
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         // Iniciar la caída de la manzana
         animator.Play("AppleFall");
-        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f || animator.IsInTransition(0) && appleWhole.transform.position.y > 2.68)
+        yield return null;
+        fallSpeed = 3f;
+        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f || animator.IsInTransition(0))
         {
             // Mueve la manzana hacia abajo
             appleWhole.transform.position += Vector3.down * fallSpeed * Time.deltaTime;
@@ -121,9 +155,12 @@ public class GameController : MonoBehaviour
             }
             piece.SetActive(true);
         }
+        // Inicia la repetición periódica del sonido
+        InvokeRepeating("PlayCorrectSound", 1f, timeBetweenRepeats);
 
         yield return new WaitUntil(() => isRoundFinished());
-       
+        CancelInvoke("PlayCorrectSound");
+        StopCurrentSound();
         // Iniciar la siguiente ronda o finalizar
         currentRound++;
 
@@ -162,6 +199,57 @@ public class GameController : MonoBehaviour
         // Aquí podrías mostrar una pantalla de resultados o reiniciar el juego.
     }
 
+    private void StopCurrentSound()
+    {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop(); // Detener cualquier sonido que esté en reproducción
+        }
+    }
+
+    private void PlayCorrectSound()
+    {
+        AudioClip correctClip = GetAudioClipForWord(currentCorrectText);
+        if (correctClip != null)
+        {
+            // Detener cualquier sonido en curso antes de reproducir el nuevo
+            StopCurrentSound();
+            StartCoroutine(PlaySoundRepeatedly(correctClip));
+        }
+        else
+        {
+            Debug.LogError("No se encontró el clip de audio para la palabra: " + currentCorrectText);
+        }
+    }
+
+    private AudioClip GetAudioClipForWord(string word)
+    {
+        // Este método debería mapear la palabra correcta a su correspondiente AudioClip
+        for (int i = 0; i < wordClips.Length; i++)
+        {
+            if (wordClips[i].name == word)
+            {
+                return wordClips[i];
+            }
+        }
+        return null;
+    }
+
+    private IEnumerator PlaySoundRepeatedly(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            animatorMonkey.Play("MonoHabla", 0, 0f);
+            // Reproducir el sonido la primera vez
+            audioSource.PlayOneShot(clip);
+
+            // Esperar la duración del sonido antes de reproducirlo de nuevo
+            yield return new WaitForSeconds(clip.length);
+
+            // Reproducir el sonido por segunda vez
+            audioSource.PlayOneShot(clip);
+        }
+    }
 
     void Shuffle(List<string> list)
     {

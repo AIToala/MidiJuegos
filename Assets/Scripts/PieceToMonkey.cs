@@ -55,7 +55,7 @@ public class PieceToMonkey : MonoBehaviour
                     {
                         meshRenderer.enabled = false;
                     }
-                    animator.Play("MonkeyCome");
+                    animator.Play("MonkeyCome", 0, 0f);
                 }
 
 
