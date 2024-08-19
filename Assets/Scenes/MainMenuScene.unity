@@ -270,6 +270,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8ac4fd31d9c8ca418a94ccb3b8d398f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  main: {fileID: 2065843993}
+  textCoin: {fileID: 389275249}
 --- !u!1 &651939967
 GameObject:
   m_ObjectHideFlags: 0
@@ -1819,7 +1821,6 @@ MonoBehaviour:
   games: []
   audioSource: {fileID: 2065843995}
   soundBG: {fileID: 8300000, guid: 836fe614dedcde347a81819ba7b18bb9, type: 3}
-  dummyCoin: {fileID: 389275253}
   score: 0
   coins: 0
   gameFinished: 0
