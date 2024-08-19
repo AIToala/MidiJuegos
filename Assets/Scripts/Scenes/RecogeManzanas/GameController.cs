@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     public string[] possibleCorrectTexts = { "FA", "LA", "RA", "CA" }; // Array de posibles textos correctos
@@ -23,8 +24,8 @@ public class GameController : MonoBehaviour
 
 
     public float fallSpeed = 3f;
-    public float minX = -2f; // Límite izquierdo del árbol
-    public float maxX = 2f;  // Límite derecho del árbol
+    public float minX = -2f; // Lï¿½mite izquierdo del ï¿½rbol
+    public float maxX = 2f;  // Lï¿½mite derecho del ï¿½rbol
     public float startY = 3.5f; // Altura inicial de la manzana
 
     public float[] separationPieces = { 0f, -6f, 6f };
@@ -37,11 +38,22 @@ public class GameController : MonoBehaviour
     public int score = 100; // Puntaje inicial
     public int pointsPerCorrectAnswer = 10; // Puntos por acierto
     public int pointsPerIncorrectAnswer = 10; // Puntos que se restan por error
-    public int minScore = 20; // Puntaje mínimo
+    public int minScore = 20; // Puntaje mï¿½nimo
 
     private int currentRound = 0;
     private int totalRounds = 2;
     private bool roundFinished = false;
+
+    public void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        if (FindObjectsOfType<GameController>().Length > 1)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         animator = appleWhole.GetComponent<Animator>();
@@ -78,7 +90,7 @@ public class GameController : MonoBehaviour
                 textMeshPro.text = textPool[i];
             }
         }
-        // Aquí podrías hacer otras configuraciones iniciales para la ronda
+        // Aquï¿½ podrï¿½as hacer otras configuraciones iniciales para la ronda
         Debug.Log("Texto correcto seleccionado: " + currentCorrectText);
         Debug.Log("Puntaje inicial: " + score);
 
@@ -88,7 +100,7 @@ public class GameController : MonoBehaviour
 
     void FallAndBreak()
     {
-        // Configurar la posición inicial de la manzana
+        // Configurar la posiciï¿½n inicial de la manzana
         float randomX = Random.Range(minX, maxX);
         appleWhole.transform.position = new Vector3(randomX, startY, appleWhole.transform.position.z);
         int x = 0;
@@ -97,19 +109,19 @@ public class GameController : MonoBehaviour
         foreach (GameObject piece in applePieces)
         {
             float positionX = randomX + separationPieces[x];
-            piece.transform.position = new Vector3(positionX , startYPieces[x], piece.transform.position.z);
-            
+            piece.transform.position = new Vector3(positionX, startYPieces[x], piece.transform.position.z);
+
             piece.transform.rotation = Quaternion.Euler(new Vector3(0, 0, randomRotation));
             SpriteRenderer spriteRenderer = piece.GetComponent<SpriteRenderer>();
-            if(randomFlip > 0.5f)
+            if (randomFlip > 0.5f)
             {
                 spriteRenderer.flipX = !spriteRenderer.flipX;
             }
             randomFlip = Random.Range(0f, 1f);
-            x +=1;
+            x += 1;
         }
-            appleWhole.SetActive(true);
-        // Iniciar la secuencia de animación y caída
+        appleWhole.SetActive(true);
+        // Iniciar la secuencia de animaciï¿½n y caï¿½da
         StartCoroutine(WobbleAndFall());
     }
 
@@ -120,12 +132,12 @@ public class GameController : MonoBehaviour
             Debug.LogError("Animator no encontrado en el GameObject: " + gameObject.name);
             yield return null;
         }
-        // Reproducir la animación de tambaleo
+        // Reproducir la animaciï¿½n de tambaleo
         animator.Play("AppleWobble");
 
-        // Esperar a que la animación "AppleWobble" termine completamente
+        // Esperar a que la animaciï¿½n "AppleWobble" termine completamente
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
-        // Iniciar la caída de la manzana
+        // Iniciar la caï¿½da de la manzana
         animator.Play("AppleFall");
         yield return null;
         fallSpeed = 3f;
@@ -136,7 +148,7 @@ public class GameController : MonoBehaviour
             yield return null; // Esperar un frame antes de continuar el bucle
         }
 
-        // Detener el movimiento (manzana ha tocado el suelo o ha terminado la animación)
+        // Detener el movimiento (manzana ha tocado el suelo o ha terminado la animaciï¿½n)
         fallSpeed = 0f;
         // Desactivar la manzana completa y activar los pedazos
         appleWhole.SetActive(false);
@@ -155,7 +167,7 @@ public class GameController : MonoBehaviour
             }
             piece.SetActive(true);
         }
-        // Inicia la repetición periódica del sonido
+        // Inicia la repeticiï¿½n periï¿½dica del sonido
         InvokeRepeating("PlayCorrectSound", 1f, timeBetweenRepeats);
 
         yield return new WaitUntil(() => isRoundFinished());
@@ -196,14 +208,15 @@ public class GameController : MonoBehaviour
     void EndGame()
     {
         Debug.Log("Juego terminado. Puntaje final: " + score);
-        // Aquí podrías mostrar una pantalla de resultados o reiniciar el juego.
+        // Aquï¿½ podrï¿½as mostrar una pantalla de resultados o reiniciar el juego.
+        SceneManager.LoadScene("RecogeManzanas - Points");
     }
 
     private void StopCurrentSound()
     {
         if (audioSource.isPlaying)
         {
-            audioSource.Stop(); // Detener cualquier sonido que esté en reproducción
+            audioSource.Stop(); // Detener cualquier sonido que estï¿½ en reproducciï¿½n
         }
     }
 
@@ -218,13 +231,13 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            Debug.LogError("No se encontró el clip de audio para la palabra: " + currentCorrectText);
+            Debug.LogError("No se encontrï¿½ el clip de audio para la palabra: " + currentCorrectText);
         }
     }
 
     private AudioClip GetAudioClipForWord(string word)
     {
-        // Este método debería mapear la palabra correcta a su correspondiente AudioClip
+        // Este mï¿½todo deberï¿½a mapear la palabra correcta a su correspondiente AudioClip
         for (int i = 0; i < wordClips.Length; i++)
         {
             if (wordClips[i].name == word)
@@ -243,7 +256,7 @@ public class GameController : MonoBehaviour
             // Reproducir el sonido la primera vez
             audioSource.PlayOneShot(clip);
 
-            // Esperar la duración del sonido antes de reproducirlo de nuevo
+            // Esperar la duraciï¿½n del sonido antes de reproducirlo de nuevo
             yield return new WaitForSeconds(clip.length);
 
             // Reproducir el sonido por segunda vez

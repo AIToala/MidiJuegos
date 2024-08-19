@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using DG.Tweening;
 
 public class CardsController : MonoBehaviour
 {
@@ -22,16 +23,16 @@ public class CardsController : MonoBehaviour
     bool isCrossing = false;
     //[SerializeField] private bool tweenCardReturn = true;
 
-    void Start()
+    public void Initialize()
     {
         GameController = FindObjectOfType<IntrusoGameController>();
+        rect = GetComponent<RectTransform>();
         images = new List<Sprite>(4);
         for (int i = 0; i < cardsToSpawn; i++)
         {
             Instantiate(slotPrefab, transform);
         }
 
-        rect = GetComponent<RectTransform>();
         cards = GetComponentsInChildren<Card>().ToList();
 
         loadIntruder();
@@ -66,12 +67,12 @@ public class CardsController : MonoBehaviour
                     cards[i].cardVisual.UpdateIndex(transform.childCount);
             }
         }
-        GameController.StartTimer();
     }
 
     void CardPointerEnter(Card card)
     {
         hoveredCard = card;
+        Debug.Log("Hovered card: " + hoveredCard.name);
     }
 
     void CardPointerExit(Card card)
@@ -104,8 +105,7 @@ public class CardsController : MonoBehaviour
         List<String> chooseRandomly = new List<String>() {
             "Gato",
             "Perro",
-            "Oso",
-            "Monito"
+            "Pajaro"
         };
         intruderPosition = UnityEngine.Random.Range(0, 4);
         String intruderName = chooseRandomly[UnityEngine.Random.Range(0, chooseRandomly.Count)];
@@ -120,7 +120,6 @@ public class CardsController : MonoBehaviour
             if (resource.name.Contains(intruderName))
             {
                 intruderSprite = resource;
-                Debug.Log("Intruder sprite: " + intruderSprite);
                 break;
             }
         }
@@ -139,12 +138,31 @@ public class CardsController : MonoBehaviour
 
         if (intruderSprite == null)
         {
-            Debug.LogError("No sprite found for intruder: " + intruderName);
             return;
         }
         else
         {
             images[intruderPosition] = intruderSprite;
         }
+    }
+
+    public void ClearCards()
+    {
+        // Stop any processes that might still reference the card
+        foreach (Card card in cards)
+        {
+            transform.DetachChildren();
+            if (card.cardVisual != null)
+            {
+                card.cardVisual.StopAllCoroutines();
+                DOTween.Kill(card.cardVisual.transform);
+                card.cardVisual.enabled = false;
+            }
+            card.transform.SetParent(null);
+            Destroy(card.gameObject);
+        }
+
+        // Clear the list of cards after destroying them
+        cards.Clear();
     }
 }

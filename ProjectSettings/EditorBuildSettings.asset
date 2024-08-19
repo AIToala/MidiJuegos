@@ -12,12 +12,18 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenuScene.unity
     guid: 02d6fc6e2b01e334a9514f2b1b604c49
   - enabled: 1
-    path: Assets/Scenes/Intruso-1-Title.unity
-    guid: 52059827134699d49af7490dfbe6b38a
-  - enabled: 1
-    path: Assets/Scenes/Intruso-2-Game.unity
+    path: Assets/Scenes/IntrusoGame.unity
     guid: ce75bb540bf6952408dae39745abc252
   - enabled: 1
-    path: Assets/Scenes/Intruso-3-End.unity
+    path: Assets/Scenes/IntrusoGame - Points.unity
     guid: 01229ed1f0023b84281d7fbf9fe4e992
+  - enabled: 1
+    path: Assets/Scenes/RecogeManzanas.unity
+    guid: 23e3df64a5123264e8a49803b0bf39f2
+  - enabled: 1
+    path: Assets/Scenes/RecogeManzanas - Points.unity
+    guid: 03b0a8a73589ab34e97be1b29ddc4e78
+  - enabled: 1
+    path: Assets/Scenes/EndGame.unity
+    guid: 939d1689cc650e14c8932fab43d3581a
   m_configObjects: {}

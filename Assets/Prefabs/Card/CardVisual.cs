@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using System.Collections;
 
 public class CardVisual : MonoBehaviour
 {
@@ -14,6 +15,11 @@ public class CardVisual : MonoBehaviour
     Vector3 movementDelta;
     private Canvas canvas;
 
+    [Header("Audios")]
+    public AudioClip correctClip;
+    public AudioClip wrongClip;
+    public AudioClip[] animalsClips;
+
     [Header("References")]
     public Transform visualShadow;
     private Vector2 shadowDistance;
@@ -22,6 +28,7 @@ public class CardVisual : MonoBehaviour
     [SerializeField] private Transform tiltParent;
     [SerializeField] private Image cardImage;
     [SerializeField] private Image answerImage;
+    [SerializeField] private AudioSource audioSource;
 
     [Header("Follow Parameters")]
     [SerializeField] private float followSpeed = 30;
@@ -35,12 +42,12 @@ public class CardVisual : MonoBehaviour
     [Header("Scale Parameters")]
     [SerializeField] private bool scaleAnimations = true;
     [SerializeField] private float scaleOnHover = 1.5f;
-    [SerializeField] private float scaleOnSelect = 1.25f;
+    //[SerializeField] private float scaleOnSelect = 1.25f;
     [SerializeField] private float scaleTransition = .15f;
     [SerializeField] private Ease scaleEase = Ease.OutBack;
 
     [Header("Select Parameters")]
-    [SerializeField] private float selectPunchAmount = 1.75f;
+    //[SerializeField] private float selectPunchAmount = 1.75f;
 
     [Header("Hover Parameters")]
     [SerializeField] private float hoverPunchAngle = 5;
@@ -65,6 +72,8 @@ public class CardVisual : MonoBehaviour
         canvas = GetComponent<Canvas>();
         shadowCanvas = visualShadow.GetComponent<Canvas>();
         answerImage = transform.GetChild(1).GetComponent<Image>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = 0.65f;
         cardImage = transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>();
         cardImage.GetComponent<Image>().sprite = image;
         if (target.CheckIfIntruder())
@@ -97,7 +106,6 @@ public class CardVisual : MonoBehaviour
         SmoothFollow();
         FollowRotation();
         CardTilt();
-
     }
 
     private void HandPositioning()
@@ -144,18 +152,57 @@ public class CardVisual : MonoBehaviour
         answerImage.GetComponent<Image>().enabled = true;
         if (scaleAnimations && answerImage.GetComponent<Image>().sprite.name == "correct")
         {
-            transform.DOScale(Vector3.one * scaleOnHover, scaleTransition).SetEase(scaleEase);
+            audioSource.clip = correctClip;
+            audioSource.Play();
+            StartCoroutine(PlaySound());
+            transform.DOScale(Vector3.one * scaleOnHover, scaleTransition).SetEase(scaleEase).SetId(1);
+            StartCoroutine(FinishAnimations());
         }
         else
         {
-            transform.DOPunchRotation(Vector3.forward * 10, 1, 20, 1);
+            audioSource.clip = wrongClip;
+            audioSource.Play();
+            transform.DOPunchRotation(Vector3.forward * 10, 1, 20, 1).SetId(3);
         }
+    }
+
+    private IEnumerator PlaySound()
+    {
+        yield return new WaitForSeconds(audioSource.clip.length);
+        if (cardImage.GetComponent<Image>().sprite.name.Contains("Pajaro"))
+        {
+            if (cardImage.GetComponent<Image>().sprite.name == "Pajaro 1")
+            {
+                audioSource.clip = animalsClips[3];
+            }
+            else
+            {
+                audioSource.clip = animalsClips[0];
+            }
+        }
+        else if (cardImage.GetComponent<Image>().sprite.name.Contains("Gato"))
+        {
+            audioSource.clip = animalsClips[1];
+        }
+        else if (cardImage.GetComponent<Image>().sprite.name.Contains("Perro"))
+        {
+            audioSource.clip = animalsClips[2];
+        }
+        audioSource.Play();
+        yield return new WaitForSeconds(audioSource.clip.length);
+    }
+
+    private IEnumerator FinishAnimations()
+    {
+        yield return new WaitForSeconds(5f);
+        parentCard.getController().ClearCards();
+        parentCard.getController().GameController.FinishRound();
     }
 
     private void PointerEnter(Card card)
     {
         if (scaleAnimations)
-            transform.DOScale(scaleOnHover, scaleTransition).SetEase(scaleEase);
+            transform.DOScale(scaleOnHover, scaleTransition).SetEase(scaleEase).SetId(4);
 
         DOTween.Kill(2, true);
         shakeParent.DOPunchRotation(Vector3.forward * hoverPunchAngle, hoverTransition, 20, 1).SetId(2);
@@ -163,6 +210,6 @@ public class CardVisual : MonoBehaviour
 
     private void PointerExit(Card card)
     {
-        transform.DOScale(1, scaleTransition).SetEase(scaleEase);
+        transform.DOScale(1, scaleTransition).SetEase(scaleEase).SetId(5);
     }
 }

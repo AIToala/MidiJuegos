@@ -5,10 +5,12 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private CardsController cardsController;
+    private AudioSource audioSource;
     private Canvas canvas;
     private Image imageComponent;
     [SerializeField] private bool instantiateVisual = true;
@@ -47,10 +49,13 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         visualHandler = FindObjectOfType<VisualCardsHandler>();
         cardVisual = Instantiate(cardVisualPrefab, visualHandler ? visualHandler.transform : canvas.transform).GetComponent<CardVisual>();
         cardVisual.Initialize(this, visualImage);
+
     }
 
     void Update()
     {
+        if (this == null) return;
+        if (cardVisual == null) return;
         ClampPosition();
     }
 
@@ -61,6 +66,11 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         clampedPosition.x = Mathf.Clamp(clampedPosition.x, -screenBounds.x, screenBounds.x);
         clampedPosition.y = Mathf.Clamp(clampedPosition.y, -screenBounds.y, screenBounds.y);
         transform.position = new Vector3(clampedPosition.x, clampedPosition.y, 0);
+    }
+
+    public CardsController getController()
+    {
+        return cardsController;
     }
 
 
@@ -106,18 +116,16 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
         if (CheckIfIntruder())
         {
             Debug.Log("Correct");
-            cardsController.GameController.StopTimer();
-            Debug.Log("Points: " + cardsController.GameController.GetPoints());
-            cardsController.GameController.FinishGame();
-            //Cambiar de escena
-            //SceneManager.LoadScene("NextSceneName");
+            cardsController.GameController.AddPerfectPoint();
         }
         else
         {
+            if (cardsController.GameController.IsRoundFinished())
+            {
+                return;
+            }
             Debug.Log("Wrong");
             cardsController.GameController.AddPlayerMiss();
-            Debug.Log("Errors: " + cardsController.GameController.GetNumberOfPlayerMisses());
-            Debug.Log("Points: " + cardsController.GameController.GetPoints());
         }
     }
 
@@ -138,7 +146,16 @@ public class Card : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 
     private void OnDestroy()
     {
+        DOTween.Kill(1, true);
+        DOTween.Kill(2, true);
+        DOTween.Kill(3, true);
+        DOTween.Kill(4, true);
+        DOTween.Kill(5, true);
+        DOTween.Kill(this, true);
         if (cardVisual != null)
+        {
             Destroy(cardVisual.gameObject);
+        }
+
     }
 }
