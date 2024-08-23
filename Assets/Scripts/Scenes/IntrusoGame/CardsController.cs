@@ -25,6 +25,8 @@ public class CardsController : MonoBehaviour
 
     public void Initialize()
     {
+        selectedCard = null;
+        hoveredCard = null;
         GameController = FindObjectOfType<IntrusoGameController>();
         rect = GetComponent<RectTransform>();
         images = new List<Sprite>(4);
@@ -72,7 +74,6 @@ public class CardsController : MonoBehaviour
     void CardPointerEnter(Card card)
     {
         hoveredCard = card;
-        Debug.Log("Hovered card: " + hoveredCard.name);
     }
 
     void CardPointerExit(Card card)

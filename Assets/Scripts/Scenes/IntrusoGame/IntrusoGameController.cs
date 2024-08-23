@@ -150,6 +150,7 @@ public class IntrusoGameController : MonoBehaviour
         numberOfErrors++;
         if (points < minScore) return;
         if (numberOfErrors > 3) return;
+        if (points - pointsPerIncorrectAnswer < minScore) return;
         points -= pointsPerIncorrectAnswer;
     }
 
@@ -175,10 +176,8 @@ public class IntrusoGameController : MonoBehaviour
 
     public void FinishGame()
     {
-        Debug.Log("Game finished");
         StopTimer();
         gameFinished = true;
-        Debug.Log("Points: " + points);
         SceneManager.LoadScene("IntrusoGame - Points");
     }
 

@@ -91,8 +91,6 @@ public class GameController : MonoBehaviour
             }
         }
         // Aqu� podr�as hacer otras configuraciones iniciales para la ronda
-        Debug.Log("Texto correcto seleccionado: " + currentCorrectText);
-        Debug.Log("Puntaje inicial: " + score);
 
         // Configurar y lanzar la manzana para la ronda
         FallAndBreak();
@@ -207,7 +205,6 @@ public class GameController : MonoBehaviour
 
     void EndGame()
     {
-        Debug.Log("Juego terminado. Puntaje final: " + score);
         // Aqu� podr�as mostrar una pantalla de resultados o reiniciar el juego.
         SceneManager.LoadScene("RecogeManzanas - Points");
     }
@@ -295,6 +292,5 @@ public class GameController : MonoBehaviour
         }
 
         // Mostrar el puntaje actualizado
-        Debug.Log("Puntaje actual: " + score);
     }
 }

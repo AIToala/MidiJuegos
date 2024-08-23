@@ -6,9 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/IntroScene.unity
-    guid: fef87efef7d187047979b40b9bb0337d
-  - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity
     guid: 02d6fc6e2b01e334a9514f2b1b604c49
   - enabled: 1
@@ -23,6 +20,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/RecogeManzanas - Points.unity
     guid: 03b0a8a73589ab34e97be1b29ddc4e78
+  - enabled: 1
+    path: Assets/Scenes/SecuenciaGame.unity
+    guid: d3271842356aeb74180ec45365eabae1
+  - enabled: 1
+    path: Assets/Scenes/SecuenciaGame - Points.unity
+    guid: 548c55e1f008da0418b5dbe2baed101a
   - enabled: 1
     path: Assets/Scenes/EndGame.unity
     guid: 939d1689cc650e14c8932fab43d3581a

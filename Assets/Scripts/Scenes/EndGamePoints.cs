@@ -24,8 +24,6 @@ public class EndGamePoints : MonoBehaviour
         animatorCoinsChange = coinsChange.GetComponent<Animator>();
         points = mainController.GetScore();
         coins = mainController.GetCoins();
-        Debug.Log("Coins: " + coins);
-        Debug.Log("Points: " + points);
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {

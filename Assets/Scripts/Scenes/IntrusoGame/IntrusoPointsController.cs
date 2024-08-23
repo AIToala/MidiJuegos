@@ -26,6 +26,7 @@ public class IntrusoPointsController : MonoBehaviour
         }
         points = gameController.GetPoints();
         pointsText.GetComponent<TMPro.TextMeshProUGUI>().text = mainController.GetScore().ToString();
+        mainController.SetScore(points);
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -49,11 +50,11 @@ public class IntrusoPointsController : MonoBehaviour
         yield return null;
         audioSource.Play();
         yield return new WaitForSeconds(audioSource.clip.length);
-        points += mainController.GetScore();
+        points = mainController.GetScore();
         pointsText.GetComponent<TMPro.TextMeshProUGUI>().text = points.ToString();
         yield return new WaitForSeconds(5f);
         Destroy(gameController.gameObject);
-        mainController.SetScore(points);
+        yield return null;
         //SEND REPORT OF GAME FINISHED TO MAIN CONTROLLER
         mainController.LoadNextGame();
     }

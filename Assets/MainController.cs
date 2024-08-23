@@ -62,7 +62,7 @@ public class MainController : MonoBehaviour
         Debug.Log("Returning to main menu");
         SceneManager.LoadScene("MainMenuScene");
         gameFinished = true;
-
+        SavePlayerData(score, coins);
         StartGameAgain();
         Debug.Log("CoinsFinish: " + coins);
     }
@@ -78,7 +78,8 @@ public class MainController : MonoBehaviour
         games = new List<string>
         {
             "IntrusoGame",
-            "RecogeManzanas"
+            "RecogeManzanas",
+            "SecuenciaGame"
         };
         currentGame = GetNextGame();
         Debug.Log("Starting game: " + currentGame);
