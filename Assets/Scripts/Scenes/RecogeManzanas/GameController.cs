@@ -19,6 +19,10 @@ public class GameController : MonoBehaviour
     public GameObject monkey;
 
     public AudioClip[] wordClips; // Array de clips de audio para las palabras correctas
+    public AudioClip monkeyEat;
+    public AudioClip appleCrash;
+    public AudioClip wrongAnswer;
+    public AudioClip correctAnswer;
     private AudioSource audioSource; // Fuente de audio
     public float timeBetweenRepeats = 15f; // Tiempo entre las repeticiones del sonido
 
@@ -122,7 +126,21 @@ public class GameController : MonoBehaviour
         // Iniciar la secuencia de animaci�n y ca�da
         StartCoroutine(WobbleAndFall());
     }
+    public void monkeyEatSound()
+    {
+        StartCoroutine(PlaySoundEnvironment(monkeyEat));
 
+    }
+    public void wrongAnswerSound()
+    {
+        StartCoroutine(PlaySoundEnvironment(wrongAnswer));
+
+    }
+    public void correctAnswerSound()
+    {
+        StartCoroutine(PlaySoundEnvironment(correctAnswer));
+
+    }
     private IEnumerator WobbleAndFall()
     {
         if (animator == null)
@@ -150,6 +168,7 @@ public class GameController : MonoBehaviour
         fallSpeed = 0f;
         // Desactivar la manzana completa y activar los pedazos
         appleWhole.SetActive(false);
+        StartCoroutine(PlaySoundEnvironment(appleCrash));
         foreach (GameObject piece in applePieces)
         {
             SpriteRenderer spriteRenderer = piece.GetComponent<SpriteRenderer>();
@@ -243,6 +262,15 @@ public class GameController : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private IEnumerator PlaySoundEnvironment(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+            yield return null;
+        }
     }
 
     private IEnumerator PlaySoundRepeatedly(AudioClip clip)

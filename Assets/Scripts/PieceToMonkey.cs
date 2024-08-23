@@ -7,15 +7,18 @@ using TMPro;
 public class PieceToMonkey : MonoBehaviour
 {
     public GameObject monkey; // Referencia al GameObject del mono
+    public GameObject like;
     public GameObject screenFlash; // Referencia al GameObject que iluminará la pantalla
     public float fadeDuration = 0.5f;
     private GameController gameController;
-   private Animator animator; // Referencia al GameController
+    private Animator animator;
+    private Animator animatorLike;// Referencia al GameController
     void Start()
     {
         // Obtener referencia al GameController
         gameController = FindObjectOfType<GameController>();
-       animator = monkey.GetComponent<Animator>();
+        animator = monkey.GetComponent<Animator>();
+        animatorLike = like.GetComponent<Animator>();
         if (gameController == null)
         {
             Debug.LogError("GameController no encontrado en la escena.");
@@ -39,7 +42,6 @@ public class PieceToMonkey : MonoBehaviour
                 // Iluminar la pantalla según si es correcto o incorrecto
                 Color flashColor = isCorrect ? new Color(0f, 1f, 0f, 0.3f) : new Color(1f, 0f, 0f, 0.5f);
 
-                StartCoroutine(FlashScreen(flashColor, isCorrect));
                 if (isCorrect)
                 {
 
@@ -55,7 +57,16 @@ public class PieceToMonkey : MonoBehaviour
                     {
                         meshRenderer.enabled = false;
                     }
-                    animator.Play("MonkeyCome", 0, 0f);
+                    gameController.monkeyEatSound();
+                    StartCoroutine(AnimationsCorrect());
+
+
+                }
+                else
+                {
+                    gameController.wrongAnswerSound();
+                    StartCoroutine(FlashScreen(flashColor, isCorrect));
+
                 }
 
 
@@ -63,7 +74,39 @@ public class PieceToMonkey : MonoBehaviour
             }
         }
     }
+    private IEnumerator AnimationsCorrect()
+    {
+        if (animator == null)
+        {
+            Debug.LogError("Animator no encontrado en el GameObject: " + monkey.name);
+            yield return null;
+        }
+        if (animatorLike == null)
+        {
+            Debug.LogError("Animator no encontrado en el GameObject: " + like.name);
+            yield return null;
+        }
+        animator.Play("MonkeyCome", 0, 0f);
+        like.SetActive(true);
+        animatorLike.Play("LikeCrece", 0, 0f);
+        // Espera un frame para asegurarte de que la animación ha empezado
+        yield return null;
 
+        // Obtén la longitud de la animación actual
+        float animationLength = animatorLike.GetCurrentAnimatorStateInfo(0).length;
+
+        // Espera el tiempo que dura la animación
+        yield return new WaitForSeconds(animationLength);
+
+        // Desactiva el GameObject
+        like.SetActive(false);
+        // Espera 5 segundos adicionales
+        yield return new WaitForSeconds(2f);
+        gameObject.SetActive(false);
+        gameController.finishRound();
+
+
+    }
     private IEnumerator FlashScreen(Color color, bool isCorrect)
     {
         // Activar la pantalla de color
@@ -106,10 +149,6 @@ public class PieceToMonkey : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         flashImage.color = new Color(0, 0, 0, 0);
         screenFlash.SetActive(false);
-        if (isCorrect)
-        {
-            gameObject.SetActive(false);
-            gameController.finishRound();
-        }
+
     }
 }
