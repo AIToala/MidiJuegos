@@ -73,7 +73,7 @@ public class CardVisual : MonoBehaviour
         shadowCanvas = visualShadow.GetComponent<Canvas>();
         answerImage = transform.GetChild(1).GetComponent<Image>();
         audioSource = GetComponent<AudioSource>();
-        audioSource.volume = 0.65f;
+        audioSource.volume = 0.5f;
         cardImage = transform.GetChild(0).GetChild(1).GetChild(0).GetComponent<Image>();
         cardImage.GetComponent<Image>().sprite = image;
         if (target.CheckIfIntruder())
@@ -173,6 +173,7 @@ public class CardVisual : MonoBehaviour
         {
             if (cardImage.GetComponent<Image>().sprite.name == "Pajaro 1")
             {
+                audioSource.volume = 0.2f;
                 audioSource.clip = animalsClips[3];
             }
             else
