@@ -116,6 +116,14 @@ public class SequenceGameController : MonoBehaviour
         yield return new WaitForSeconds(animatorTitle.GetCurrentAnimatorStateInfo(0).length);
         yield return null;
         sequenceTitle.SetActive(false);
+        float prevVolume = audioSource.volume;
+        audioSource.clip = Resources.Load<AudioClip>("SecuenciaImages/Audios/Secuencia");
+        audioSource.volume = 0.35f;
+        audioSource.Play();
+        yield return new WaitForSeconds(audioSource.clip.length);
+        audioSource.volume = prevVolume;
+        yield return new WaitForSeconds(0.35f);
+        yield return null;
     }
 
     private IEnumerator ShowAndAnimateRoundText()

@@ -43,7 +43,7 @@ public class IntrusoGameController : MonoBehaviour
             return;
         }
 
-        // Si no existe una instancia, asigna esta como la instancia única
+        // Si no existe una instancia, asigna esta como la instancia ï¿½nica
         instance = this;
 
         // No destruyas este objeto al cargar nuevas escenas
@@ -52,7 +52,7 @@ public class IntrusoGameController : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Asegúrate de que la instancia sea null al destruirse
+        // Asegï¿½rate de que la instancia sea null al destruirse
         if (instance == this)
         {
             instance = null;
@@ -65,6 +65,7 @@ public class IntrusoGameController : MonoBehaviour
         animatorTitle = intrusoTitle.GetComponent<Animator>();
         animatorRoundText = roundText.GetComponent<Animator>();
         cardsController = FindObjectOfType<CardsController>();
+        audioSource = GetComponent<AudioSource>();
         timer = FindObjectOfType<TimerController>();
 
         cardsController.GameController = this;
@@ -94,6 +95,10 @@ public class IntrusoGameController : MonoBehaviour
         yield return new WaitForSeconds(animatorTitle.GetCurrentAnimatorStateInfo(0).length);
         yield return null;
         intrusoTitle.SetActive(false);
+        audioSource.Play();
+        yield return new WaitForSeconds(audioSource.clip.length);
+        yield return new WaitForSeconds(0.35f);
+        yield return null;
     }
 
     private IEnumerator StartRound()

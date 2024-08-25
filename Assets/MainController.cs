@@ -93,11 +93,6 @@ public class MainController : MonoBehaviour
         games = new List<string>
         {
             "SecuenciaGame",
-            "SecuenciaGame",
-            "IntrusoGame",
-            "IntrusoGame",
-            "RecogeManzanas",
-            "RecogeManzanas",
         };
         currentGame = GetNextGame();
         Debug.Log("Starting game: " + currentGame);

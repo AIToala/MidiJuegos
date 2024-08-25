@@ -143,7 +143,7 @@ public class MusicTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void PlayClip()
     {
-        audioSource.Play();
+        audioSource.PlayOneShot(clip);
     }
 
     public void StopClip()

@@ -28,7 +28,7 @@ public class MusicTileController : MonoBehaviour
     public float glowDuration = 0.5f;
     public int glowTimes = 1;
     public float delayBetweenGlows = 0.5f;
-    public float repeatInterval = 10f;
+    public float repeatInterval = 6f;
 
     public void Initialize()
     {
@@ -96,13 +96,13 @@ public class MusicTileController : MonoBehaviour
         foreach (int order in GameController.GetSequence())
         {
             MusicTile tile = tiles[order];
-            tile.GetImageComponent().DOColor(tile.GetColorGlow(), 1.5f);
-            tile.GetIconComponent().DOColor(tile.baseColor, 1.5f);
+            tile.GetImageComponent().DOColor(tile.GetColorGlow(), 1f);
+            tile.GetIconComponent().DOColor(tile.baseColor, 1f);
             tile.PlayClip();
-            yield return new WaitForSeconds(3f);
-            tile.GetImageComponent().DOColor(tile.baseColor, 1.5f);
-            tile.GetIconComponent().DOColor(tile.GetColorGlow(), 1.5f);
             yield return new WaitForSeconds(1.5f);
+            tile.GetImageComponent().DOColor(tile.baseColor, 1f);
+            tile.GetIconComponent().DOColor(tile.GetColorGlow(), 1f);
+            yield return new WaitForSeconds(tile.GetAudioSource().clip.length);
             yield return null;
         }
         GetComponentInParent<Image>().sprite = Resources.Load<Sprite>("SecuenciaImages/TURN");
@@ -116,10 +116,11 @@ public class MusicTileController : MonoBehaviour
         if (tile.GetColor() == "GREEN") tile.SetGlow();
         if (tile.GetColor() == "YELLOW") tile.SetGlow();
         tile.PlayClip();
-        yield return new WaitForSeconds(tile.GetAudioSource().clip.length);
+        Debug.Log(tile.GetAudioSource().clip.length);
+        yield return new WaitForSecondsRealtime(tile.GetAudioSource().clip.length);
         yield return new WaitForSeconds(0.5f);
         tile.SetBase();
-
+        yield return new WaitForEndOfFrame();
         yield return null;
     }
 
@@ -162,6 +163,7 @@ public class MusicTileController : MonoBehaviour
         }
         if (correctSequence)
         {
+            StartCoroutine(WaitForLastSound());
             GameController.AddPoint();
             ResetSelectedTiles();
             ClearMusicTiles();
@@ -171,6 +173,12 @@ public class MusicTileController : MonoBehaviour
         {
             GameController.AddPlayerMiss();
         }
+    }
+    private IEnumerator WaitForLastSound()
+    {
+        selectedTiles[3].PlayClip();
+        yield return new WaitForSeconds(selectedTiles[3].GetAudioSource().clip.length);
+        yield return null;
     }
 
     void Update()
