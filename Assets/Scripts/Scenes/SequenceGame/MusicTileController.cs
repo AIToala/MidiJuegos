@@ -5,9 +5,6 @@ using System.Linq;
 using System;
 using DG.Tweening;
 using UnityEngine.UI;
-using UnityEngine.Timeline;
-using UnityEditor.U2D.Aseprite;
-using Unity.VisualScripting;
 
 public class MusicTileController : MonoBehaviour
 {

@@ -165,6 +165,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
+    Android: com.midiTeam2.midijuegos
     Standalone: com.DefaultCompany.2DProject
   buildNumber:
     Standalone: 0
@@ -291,7 +292,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 165250968739aa942bc79959feb0951b, type: 3}
+      m_Icon: {fileID: 2800000, guid: fe8c5a8669f5b6248b22a13161f42f5a, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0

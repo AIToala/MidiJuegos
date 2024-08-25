@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
-using Microsoft.Unity.VisualStudio.Editor;
-
 public class SequencePointsController : MonoBehaviour
 {
     private SequenceGameController gameController;
