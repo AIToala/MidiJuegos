@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class IntrusoGameController : MonoBehaviour
 {
-    public static IntrusoGameController instance;
+    //public static IntrusoGameController instance;
     [Header("Game Objects")]
     [SerializeField] public GameObject intrusoTitle;
     [SerializeField] public GameObject roundText;
@@ -32,13 +32,30 @@ public class IntrusoGameController : MonoBehaviour
     private Animator animatorRoundText;
     private Animator animatorTitle;
 
+    public static IntrusoGameController instance = null;
+
     public void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-
-        if (FindObjectsOfType<IntrusoGameController>().Length > 1)
+        // Si ya existe una instancia de GameController, destruye este objeto
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Si no existe una instancia, asigna esta como la instancia única
+        instance = this;
+
+        // No destruyas este objeto al cargar nuevas escenas
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // Asegúrate de que la instancia sea null al destruirse
+        if (instance == this)
+        {
+            instance = null;
         }
     }
 

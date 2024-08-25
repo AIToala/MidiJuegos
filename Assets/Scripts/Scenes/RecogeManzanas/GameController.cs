@@ -48,13 +48,30 @@ public class GameController : MonoBehaviour
     private int totalRounds = 2;
     private bool roundFinished = false;
 
+    private static GameController instance = null;
+
     public void Awake()
     {
-        DontDestroyOnLoad(gameObject);
-
-        if (FindObjectsOfType<GameController>().Length > 1)
+        // Si ya existe una instancia de GameController, destruye este objeto
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
+            return;
+        }
+
+        // Si no existe una instancia, asigna esta como la instancia única
+        instance = this;
+
+        // No destruyas este objeto al cargar nuevas escenas
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // Asegúrate de que la instancia sea null al destruirse
+        if (instance == this)
+        {
+            instance = null;
         }
     }
 

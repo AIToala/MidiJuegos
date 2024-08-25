@@ -77,9 +77,12 @@ public class MainController : MonoBehaviour
     {
         games = new List<string>
         {
+            "SecuenciaGame",
+            "SecuenciaGame",
+            "IntrusoGame",
             "IntrusoGame",
             "RecogeManzanas",
-            "SecuenciaGame"
+            "RecogeManzanas",
         };
         currentGame = GetNextGame();
         Debug.Log("Starting game: " + currentGame);
@@ -158,7 +161,7 @@ public class MainController : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(GetCurrentGame());
+        SceneManager.LoadScene(GetCurrentGame(), LoadSceneMode.Single);
     }
 
     public void LoadNextGame()
@@ -170,7 +173,7 @@ public class MainController : MonoBehaviour
             return;
         }
         GetNextGame();
-        SceneManager.LoadScene(GetCurrentGame());
+        SceneManager.LoadScene(GetCurrentGame(), LoadSceneMode.Single);
     }
 
     public void FinishGame()
