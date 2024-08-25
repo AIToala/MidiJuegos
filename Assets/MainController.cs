@@ -10,7 +10,8 @@ public class MainController : MonoBehaviour
 
     [SerializeField] private string sceneName;
     [Header("Global Game Objects")]
-    [SerializeField] private List<string> games;
+    [SerializeField] private List<string> games1;
+    [SerializeField] private List<string> games2;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip soundBG;
 
@@ -27,7 +28,8 @@ public class MainController : MonoBehaviour
         {
             Destroy(gameObject);
             sceneName = main.sceneName;
-            games = main.games;
+            games1 = main.games1;
+            games2 = main.games2;
             audioSource = main.audioSource;
             soundBG = main.soundBG;
             score = main.score;
@@ -66,10 +68,21 @@ public class MainController : MonoBehaviour
 
     public string GetNextGame()
     {
-        string game = games[UnityEngine.Random.Range(0, games.Count)];
-        currentGame = game;
-        RemoveGame(game);
-        return game;
+        if(games1.Count != 0)
+        {
+            string game = games1[UnityEngine.Random.Range(0, games1.Count)];
+            currentGame = game;
+            RemoveGame(game);
+            return game;
+        }
+        else
+        {
+            string game = games2[UnityEngine.Random.Range(0, games2.Count)];
+            currentGame = game;
+            RemoveGame(game);
+            return game;
+        }
+
     }
 
     public void FinishAndReturnToMenu()
@@ -84,19 +97,31 @@ public class MainController : MonoBehaviour
 
     public string RemoveGame(string game)
     {
-        games.Remove(game);
-        return game;
+        if(games1.Count > 0)
+        {
+            games1.Remove(game);
+            return game;
+        }
+        else
+        {
+            games2.Remove(game);
+            return game;
+        }
+
     }
 
     public void LoadGames()
     {
-        games = new List<string>
+        games1 = new List<string>
         {
             "SecuenciaGame",
-            "SecuenciaGame",
-            "IntrusoGame",
             "IntrusoGame",
             "RecogeManzanas",
+        };
+        games2 = new List<string>
+        {
+            "SecuenciaGame",
+            "IntrusoGame",
             "RecogeManzanas",
         };
         currentGame = GetNextGame();
@@ -182,10 +207,13 @@ public class MainController : MonoBehaviour
     public void LoadNextGame()
     {
         //Maybe put animations in here like fade out and on start in next scene a fadein
-        if (games.Count == 0)
+        if (games1.Count == 0)
         {
-            FinishGame();
-            return;
+            if (games2.Count == 0)
+            {
+                FinishGame();
+                return;
+            }
         }
         GetNextGame();
         SceneManager.LoadScene(GetCurrentGame(), LoadSceneMode.Single);
