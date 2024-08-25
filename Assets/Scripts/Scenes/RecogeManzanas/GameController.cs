@@ -5,7 +5,9 @@ using TMPro;
 using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
-    public string[] possibleCorrectTexts = { "FA", "LA", "RA", "CA" }; // Array de posibles textos correctos
+    private string[] possibleCorrectTexts = { "FA", "LA", "RA", "CA", 
+        "A", "E", "I", "O", "U", "ME", "NE", "SE", "GE", "YI", "TI", "BLI", 
+        "PLI", "FLO", "CLO", "TLO", "AU", "SU", "KU", "DU"}; // Array de posibles textos correctos
     public string currentCorrectText; // Texto correcto actual seleccionado
     Dictionary<string, string[]> incorrectTexts = new Dictionary<string, string[]>()
     {
@@ -13,16 +15,39 @@ public class GameController : MonoBehaviour
     {"LA", new string[] {"FA", "NA"} },
     {"RA", new string[] { "FA", "NA"} },
     {"CA", new string[] { "FA", "NA"} },
+        {"A", new string[] {"I", "O"} },
+    {"E", new string[] {"A", "U"} },
+    {"I", new string[] { "O", "U"} },
+    {"O", new string[] { "E", "I"} },
+        {"U", new string[] {"E", "A"} },
+    {"ME", new string[] {"RE", "YE"} },
+    {"NE", new string[] { "LE", "HE"} },
+    {"SE", new string[] { "AU", "NE"} },
+        {"GE", new string[] {"DE", "RE"} },
+    {"YI", new string[] {"SI", "LI"} },
+    {"TI", new string[] { "FLI", "YI"} },
+    {"BLI", new string[] { "TI", "YI"} },
+        {"PLI", new string[] {"LI", "RI"} },
+    {"FLO", new string[] {"FO", "NO"} },
+    {"CLO", new string[] { "DO", "NO"} },
+    {"TLO", new string[] { "TO", "RO"} },
+        {"AU", new string[] {"DU", "A"} },
+    {"SU", new string[] {"TU", "YU"} },
+    {"KU", new string[] { "SU", "YU"} },
+    {"DU", new string[] { "RU", "CU"} },
     };// Array de textos incorrectos
     public GameObject[] applePieces; // Referencias a los pedazos de manzana
     public GameObject appleWhole;
     public GameObject monkey;
+    public GameObject title;
+
 
     public AudioClip[] wordClips; // Array de clips de audio para las palabras correctas
     public AudioClip monkeyEat;
     public AudioClip appleCrash;
     public AudioClip wrongAnswer;
     public AudioClip correctAnswer;
+    public AudioClip instructionsVoice;
     private AudioSource audioSource; // Fuente de audio
     public float timeBetweenRepeats = 15f; // Tiempo entre las repeticiones del sonido
 
@@ -37,6 +62,7 @@ public class GameController : MonoBehaviour
 
     private Animator animator;
     private Animator animatorMonkey;
+    private Animator animatorTitle;
     public float rotateSpeed = 100f;
 
     public int score = 100; // Puntaje inicial
@@ -79,16 +105,52 @@ public class GameController : MonoBehaviour
     {
         animator = appleWhole.GetComponent<Animator>();
         animatorMonkey = monkey.GetComponent<Animator>();
+        animatorTitle = title.GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             Debug.LogError("AudioSource no encontrado en el GameController.");
             return;
         }
-        StartRound();
+        title.SetActive(true);
+        // Iniciar la corrutina que controlará el flujo
+        StartCoroutine(StartGameFlow());
+
         InvokeRepeating("PlayCorrectSound", timeBetweenRepeats, timeBetweenRepeats);
     }
+    private IEnumerator StartGameFlow()
+    {
+        // Ejecutar IniciarTitulo() y esperar a que termine
+        yield return StartCoroutine(ShowAndAnimateTitle());
 
+        // Una vez que ShowAndAnimateTitle() haya terminado, iniciar la ronda
+        StartRound();
+    }
+    private IEnumerator ShowAndAnimateTitle()
+    {
+
+        if (animatorTitle == null)
+        {
+            Debug.LogError("Animator no encontrado en el GameObject" + gameObject.name);
+            yield return null;
+        }
+        yield return new WaitForSeconds(3f);
+        //play-sound-title
+        audioSource.PlayOneShot(instructionsVoice);
+        yield return null;
+
+        //wait-for-sound
+        animatorTitle.Play("TitleFade", 0, 0f);
+        yield return null;
+
+        float animationLength = animatorTitle.GetCurrentAnimatorStateInfo(0).length;
+
+        yield return new WaitForSeconds(animationLength);
+
+        title.SetActive(false);
+
+        yield return null;
+    }
     void StartRound()
     {
         roundFinished = false;
@@ -166,12 +228,12 @@ public class GameController : MonoBehaviour
             yield return null;
         }
         // Reproducir la animaci�n de tambaleo
-        animator.Play("AppleWobble");
+        animator.Play("AppleWobble", 0, 0f);
 
         // Esperar a que la animaci�n "AppleWobble" termine completamente
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
         // Iniciar la ca�da de la manzana
-        animator.Play("AppleFall");
+        animator.Play("AppleFall", 0, 0f);
         yield return null;
         fallSpeed = 3f;
         while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f || animator.IsInTransition(0))
@@ -273,7 +335,7 @@ public class GameController : MonoBehaviour
         // Este m�todo deber�a mapear la palabra correcta a su correspondiente AudioClip
         for (int i = 0; i < wordClips.Length; i++)
         {
-            if (wordClips[i].name == word)
+            if (wordClips[i].name.ToUpper() == word.ToUpper())
             {
                 return wordClips[i];
             }
@@ -300,6 +362,9 @@ public class GameController : MonoBehaviour
 
             // Esperar la duraci�n del sonido antes de reproducirlo de nuevo
             yield return new WaitForSeconds(clip.length);
+
+            // Esperar 1 segundo antes de reproducir el segundo sonido
+            yield return new WaitForSeconds(1.7f);
 
             // Reproducir el sonido por segunda vez
             audioSource.PlayOneShot(clip);
