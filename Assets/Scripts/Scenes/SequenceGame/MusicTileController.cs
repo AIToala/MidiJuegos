@@ -21,23 +21,28 @@ public class MusicTileController : MonoBehaviour
     public List<MusicTile> tiles = new List<MusicTile>(4);
     public List<MusicTile> selectedTiles = new List<MusicTile>(4);
     public List<Sprite> images = new List<Sprite>(4);
+    public List<AudioClip> audioSequence;
 
     [Header("Animations")]
-    public Color glowColor = Color.magenta;
+    public Color glowColor = Color.white;
     public float glowDuration = 0.5f;
     public int glowTimes = 1;
     public float delayBetweenGlows = 0.5f;
-    public float repeatInterval = 10f;
-
-    private Material[] originalMaterials;
-
+    public float repeatInterval = 6f;
 
     public void Initialize()
     {
+        audioSequence = new List<AudioClip>(4);
+        if (GameController.GetAudioSequence() == null)
+        {
+            audioSequence = GameController.GenerateRandomAudioSequence();
+            GameController.SetAudioSequence(audioSequence);
+        }
         selectedTile = null;
         hoveredTile = null;
         GameController = FindObjectOfType<SequenceGameController>();
         images = new List<Sprite>(4);
+        audioSequence = GameController.GetAudioSequence();
         grid = GetComponent<GridLayoutGroup>();
         grid.cellSize = new Vector2(size, size);
         grid.spacing = new Vector2(20, 20);
@@ -55,21 +60,21 @@ public class MusicTileController : MonoBehaviour
         tiles = GetComponentsInChildren<MusicTile>().ToList();
         LoadSequence();
         int tileCount = 0;
+        List<int> sequence = GameController.GetSequence();
         foreach (MusicTile tile in tiles)
         {
-            tile.SetImage(images[tileCount]);
+            if (images[tileCount].name.Contains("RED")) tile.SetColor("RED");
+            if (images[tileCount].name.Contains("BLUE")) tile.SetColor("BLUE");
+            if (images[tileCount].name.Contains("GREEN")) tile.SetColor("GREEN");
+            if (images[tileCount].name.Contains("YELLOW")) tile.SetColor("YELLOW");
+            tile.SetClip(audioSequence[tileCount]);
             tile.PointerEnterEvent.AddListener(TilePointerEnter);
             tile.PointerExitEvent.AddListener(TilePointerExit);
             tile.PointerClickEvent.AddListener(TilePointerClick);
-            tile.name = "Music Tile" + tileCount.ToString();
+            tile.name = "Music Tile" + tile.GetColor();
             tile.SetIndex(tileCount);
+            tile.SetBase();
             tileCount++;
-        }
-
-        originalMaterials = new Material[tiles.Count];
-        for (int i = 0; i < tiles.Count; i++)
-        {
-            originalMaterials[i] = tiles[i].GetComponent<Image>().material;
         }
 
         StartCoroutine(RepeatGlowSequence());
@@ -87,12 +92,36 @@ public class MusicTileController : MonoBehaviour
 
     private IEnumerator GlowSequence()
     {
+        GetComponentInParent<Image>().sprite = Resources.Load<Sprite>("SecuenciaImages/LISTEN");
         foreach (int order in GameController.GetSequence())
         {
-            tiles[order].GetComponent<Image>().DOColor(glowColor, glowDuration);
-            yield return new WaitForSeconds(delayBetweenGlows);
-            tiles[order].GetComponent<Image>().DOColor(Color.white, glowDuration);
+            MusicTile tile = tiles[order];
+            tile.GetImageComponent().DOColor(tile.GetColorGlow(), 1f);
+            tile.GetIconComponent().DOColor(tile.baseColor, 1f);
+            tile.PlayClip();
+            yield return new WaitForSeconds(1.5f);
+            tile.GetImageComponent().DOColor(tile.baseColor, 1f);
+            tile.GetIconComponent().DOColor(tile.GetColorGlow(), 1f);
+            yield return new WaitForSeconds(tile.GetAudioSource().clip.length);
+            yield return null;
         }
+        GetComponentInParent<Image>().sprite = Resources.Load<Sprite>("SecuenciaImages/TURN");
+    }
+
+    private IEnumerator GlowTile(MusicTile tile)
+    {
+        string color = tile.GetColor().ToUpper();
+        if (tile.GetColor() == "RED") tile.SetGlow();
+        if (tile.GetColor() == "BLUE") tile.SetGlow();
+        if (tile.GetColor() == "GREEN") tile.SetGlow();
+        if (tile.GetColor() == "YELLOW") tile.SetGlow();
+        tile.PlayClip();
+        Debug.Log(tile.GetAudioSource().clip.length);
+        yield return new WaitForSecondsRealtime(tile.GetAudioSource().clip.length);
+        yield return new WaitForSeconds(0.5f);
+        tile.SetBase();
+        yield return new WaitForEndOfFrame();
+        yield return null;
     }
 
     public void TilePointerEnter(MusicTile tile)
@@ -108,7 +137,7 @@ public class MusicTileController : MonoBehaviour
     public void TilePointerClick(MusicTile tile)
     {
         selectedTile = tile;
-        //glowTile(tile);
+        StartCoroutine(GlowTile(tile));
         SetSelectedTile();
 
     }
@@ -128,19 +157,28 @@ public class MusicTileController : MonoBehaviour
             else
             {
                 selectedTiles[i].SetIsCorrect(false);
-                //play-sound-error
                 correctSequence = false;
-                GameController.AddPlayerMiss();
                 break;
             }
         }
         if (correctSequence)
         {
+            StartCoroutine(WaitForLastSound());
             GameController.AddPoint();
             ResetSelectedTiles();
             ClearMusicTiles();
             GameController.FinishRound();
         }
+        else
+        {
+            GameController.AddPlayerMiss();
+        }
+    }
+    private IEnumerator WaitForLastSound()
+    {
+        selectedTiles[3].PlayClip();
+        yield return new WaitForSeconds(selectedTiles[3].GetAudioSource().clip.length);
+        yield return null;
     }
 
     void Update()
@@ -150,10 +188,10 @@ public class MusicTileController : MonoBehaviour
 
     void LoadSequence()
     {
-        Sprite[] resources = Resources.LoadAll<Sprite>("SecuenciaImages/MusicTile");
+        Sprite[] resources = Resources.LoadAll<Sprite>("SecuenciaImages/MusicTile/Base");
         if (resources == null || resources.Length == 0)
         {
-            Debug.LogError("No images found in folder: " + "SecuenciaImages/MusicTile");
+            Debug.LogError("No images found in folder: " + "SecuenciaImages/MusicTile/Base");
             return;
         }
         resources = resources.OrderBy(x => Guid.NewGuid()).ToArray();
@@ -198,7 +236,10 @@ public class MusicTileController : MonoBehaviour
         foreach (MusicTile tile in tiles)
         {
             tile.StopAllCoroutines();
+            DOTween.Kill(tile.GetImageComponent());
+            DOTween.Kill(tile.GetIconComponent());
             DOTween.Kill(tile.transform);
+
             tile.enabled = false;
             tile.transform.SetParent(null);
             Destroy(tile.gameObject);
