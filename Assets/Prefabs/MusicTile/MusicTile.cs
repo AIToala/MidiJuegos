@@ -12,7 +12,8 @@ public class MusicTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     private MusicTileController gameController;
     private AudioSource audioSource;
     private Canvas canvas;
-    private Image imageComponent;
+    public Image imageComponent;
+    public Image iconComponent;
 
     [Header("Selection Parameters")]
     public bool selected;
@@ -26,17 +27,28 @@ public class MusicTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     [HideInInspector] public UnityEvent<MusicTile> PointerClickEvent;
 
     [Header("MusicTile Parameters")]
-    [SerializeField] private Sprite image;
     [SerializeField] private AudioClip clip;
+    [SerializeField] private string color;
     [SerializeField] private bool isCorrect;
     [SerializeField] private int index;
+
+    public Color32 baseColor = new Color32(254, 254, 254, 255);
 
     void Start()
     {
         canvas = GetComponentInParent<Canvas>();
-        imageComponent = GetComponent<Image>();
         gameController = FindObjectOfType<MusicTileController>();
         audioSource = GetComponent<AudioSource>();
+    }
+
+    public Image GetImageComponent()
+    {
+        return imageComponent;
+    }
+
+    public Image GetIconComponent()
+    {
+        return iconComponent;
     }
 
     private void PointerClick(MusicTile arg0)
@@ -62,11 +74,61 @@ public class MusicTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         return isCorrect;
     }
 
-    public void SetImage(Sprite image)
+    public void SetBase()
     {
-        if (image == null) return;
-        this.image = image;
-        this.GetComponent<Image>().sprite = image;
+        if (imageComponent == null)
+        {
+            imageComponent = GetComponent<Image>();
+            imageComponent.sprite = Resources.Load<Sprite>("SecuenciaImages/MusicTile/BaseColor");
+        }
+        if (iconComponent == null)
+        {
+            iconComponent = GetComponentInChildren<Image>();
+            iconComponent.sprite = Resources.Load<Sprite>("SecuenciaImages/MusicTile/MusicalNote");
+        }
+        imageComponent.color = new Color32(254, 254, 254, 255);
+        if (this.color == "BLUE") iconComponent.color = new Color32(10, 126, 242, 255);
+        if (this.color == "GREEN") iconComponent.color = new Color32(82, 197, 75, 255);
+        if (this.color == "RED") iconComponent.color = new Color32(230, 50, 44, 255);
+        if (this.color == "YELLOW") iconComponent.color = new Color32(251, 198, 46, 255);
+    }
+
+    public void SetGlow()
+    {
+        if (imageComponent == null)
+        {
+            imageComponent = GetComponent<Image>();
+            imageComponent.sprite = Resources.Load<Sprite>("SecuenciaImages/MusicTile/BaseColor");
+        }
+        if (iconComponent == null)
+        {
+            iconComponent = GetComponentInChildren<Image>();
+            iconComponent.sprite = Resources.Load<Sprite>("SecuenciaImages/MusicTile/MusicalNote");
+        }
+        iconComponent.color = new Color32(254, 254, 254, 255);
+        if (this.color == "BLUE") imageComponent.color = new Color32(10, 126, 242, 255);
+        if (this.color == "GREEN") imageComponent.color = new Color32(82, 197, 75, 255);
+        if (this.color == "RED") imageComponent.color = new Color32(230, 50, 44, 255);
+        if (this.color == "YELLOW") imageComponent.color = new Color32(251, 198, 46, 255);
+    }
+
+    public Color32 GetColorGlow()
+    {
+        if (this.color == "BLUE") return new Color32(10, 126, 242, 255);
+        if (this.color == "GREEN") return new Color32(82, 197, 75, 255);
+        if (this.color == "RED") return new Color32(230, 50, 44, 255);
+        if (this.color == "YELLOW") return new Color32(251, 198, 46, 255);
+        return new Color32(254, 254, 254, 255);
+    }
+
+    public void SetColor(string color)
+    {
+        this.color = color;
+    }
+
+    public string GetColor()
+    {
+        return color;
     }
 
     public void SetIndex(int index)
@@ -91,8 +153,15 @@ public class MusicTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     public void SetClip(AudioClip clip)
     {
+        if (clip == null) return;
         this.clip = clip;
-        audioSource.clip = clip;
+        this.GetComponent<AudioSource>().clip = clip;
+        this.GetComponent<AudioSource>().volume = 0.35f;
+    }
+
+    public AudioSource GetAudioSource()
+    {
+        return audioSource;
     }
 
     void Update()

@@ -153,6 +153,7 @@ public class CardVisual : MonoBehaviour
         if (scaleAnimations && answerImage.GetComponent<Image>().sprite.name == "correct")
         {
             audioSource.clip = correctClip;
+            audioSource.volume = 0.25f;
             audioSource.Play();
             StartCoroutine(PlaySound());
             transform.DOScale(Vector3.one * scaleOnHover, scaleTransition).SetEase(scaleEase).SetId(1);
@@ -161,6 +162,7 @@ public class CardVisual : MonoBehaviour
         else
         {
             audioSource.clip = wrongClip;
+            audioSource.volume = 0.2f;
             audioSource.Play();
             transform.DOPunchRotation(Vector3.forward * 10, 1, 20, 1).SetId(3);
         }
@@ -173,7 +175,7 @@ public class CardVisual : MonoBehaviour
         {
             if (cardImage.GetComponent<Image>().sprite.name == "Pajaro 1")
             {
-                audioSource.volume = 0.2f;
+                audioSource.volume = 0.025f;
                 audioSource.clip = animalsClips[3];
             }
             else

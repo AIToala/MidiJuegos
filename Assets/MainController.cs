@@ -26,6 +26,14 @@ public class MainController : MonoBehaviour
         if (main != null && main != this)
         {
             Destroy(gameObject);
+            sceneName = main.sceneName;
+            games = main.games;
+            audioSource = main.audioSource;
+            soundBG = main.soundBG;
+            score = main.score;
+            coins = main.coins;
+            gameFinished = main.gameFinished;
+            currentGame = main.currentGame;
         }
         else
         {
@@ -46,7 +54,14 @@ public class MainController : MonoBehaviour
 
     public void StopMusic()
     {
-        audioSource.Stop();
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
     }
 
     public string GetNextGame()

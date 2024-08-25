@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
+using Microsoft.Unity.VisualStudio.Editor;
 
 public class SequencePointsController : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class SequencePointsController : MonoBehaviour
     public GameObject pointsText;
     public GameObject pointsChange;
     public Animator animatorTextChange;
+    public GameObject notaMusical;
 
     private int points;
     void Start()
@@ -19,9 +22,10 @@ public class SequencePointsController : MonoBehaviour
         gameController = FindObjectOfType<SequenceGameController>();
         mainController = FindObjectOfType<MainController>();
         animatorTextChange = pointsChange.GetComponent<Animator>();
+        notaMusical.transform.DOShakeRotation(1f, new Vector3(0f, 0f, 90f), 10, 90f).SetId(10);
         if (gameController == null)
         {
-            Debug.LogError("SequenceGameController no encontrado en IntrusoPointsController.");
+            Debug.LogError("SequenceGameController no encontrado en SequencePointsController.");
             return;
         }
         points = gameController.GetPoints();
@@ -56,6 +60,7 @@ public class SequencePointsController : MonoBehaviour
         Destroy(gameController.gameObject);
         yield return null;
         //SEND REPORT OF GAME FINISHED TO MAIN CONTROLLER
+        DOTween.Kill(notaMusical.transform);
         mainController.LoadNextGame();
     }
 }

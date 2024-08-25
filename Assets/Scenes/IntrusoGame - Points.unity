@@ -256,15 +256,16 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\xA1MUY BIEN!"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 30e195569a2559b45b9f739a92995688, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 634b9946dff3e0b4fbf03980d72be696, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 99e1f9999ace65e43bdb74ee8c335809, type: 2}
+  m_sharedMaterial: {fileID: 2151905055864447746, guid: 99e1f9999ace65e43bdb74ee8c335809,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4292598747
-  m_fontColor: {r: 0.8584906, g: 0.8584906, b: 0.8584906, a: 1}
+    rgba: 4279266223
+  m_fontColor: {r: 0.6862745, g: 0.41960788, b: 0.0627451, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -349,7 +350,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1104466746
 RectTransform:
   m_ObjectHideFlags: 0
@@ -793,7 +794,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1487841945
 RectTransform:
   m_ObjectHideFlags: 0
